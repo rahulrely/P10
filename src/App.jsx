@@ -51,6 +51,7 @@ function App() {
       {gameState === 'leaderboard' && (
         <Leaderboard
           players={players}
+          round={round}
           onNextRound={handleNextRound}
         />
       )}

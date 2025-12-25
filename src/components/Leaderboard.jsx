@@ -1,14 +1,24 @@
 import React from 'react';
 
-export default function Leaderboard({ players, onNextRound }) {
-    // Sort: Lowest Score first (Ascending)
+export default function Leaderboard({ players, round, onNextRound }) {
+    const showScores = round >= 10;
+
+    // Sort: 
+    // If scores hidden: Highest Phase first (Descending), then Name
+    // If scores shown: Lowest Score first (Ascending)
     const sortedPlayers = [...players].sort((a, b) => {
+        if (!showScores) {
+            if (b.phase !== a.phase) return b.phase - a.phase;
+            return a.name.localeCompare(b.name);
+        }
         return a.score - b.score;
     });
 
     return (
         <div className="glass-panel animate-fade-in">
-            <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Leaderboard</h2>
+            <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                Leaderboard {showScores ? '(Final)' : '(Hidden)'}
+            </h2>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
                 {sortedPlayers.map((player, index) => (
@@ -37,7 +47,7 @@ export default function Leaderboard({ players, onNextRound }) {
                             </div>
                         </div>
                         <div style={{ fontWeight: 700, fontSize: '1.2rem' }}>
-                            {player.score}
+                            {showScores ? player.score : '???'}
                         </div>
                     </div>
                 ))}
