@@ -1,16 +1,44 @@
-# React + Vite
+# Phase Ten Scorer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A sleek, digital scorekeeper and phase tracker for the classic card game, Phase 10. Built with React and Vite. Say goodbye to pen and paper!
 
-Currently, two official plugins are available:
+## Features
+- **Dynamic Player Setup:** Easily add player names at the start of the game.
+- **Streamlined Scoring:** Quickly enter points for each player at the end of every round. 
+- **Auto Phase Tracking:** Automatically progresses players to the next phase (up to Phase 10).
+- **Live Leaderboard:** Keep track of total scores and current phases for all players in real-time.
+- **End of Game Tracking:** Concludes the game and provides final standings.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## How to play & use the app
+1. **Setup:** Launch the app, enter the names of all players participating in the game, and click start.
+2. **Play a Round:** Play a round of Phase 10 in real life. 
+3. **Scoring:** At the end of the round, input the points accumulated by each player. The app will automatically calculate total scores and advance phases.
+4. **Leaderboard:** Check the leaderboard to see everyone's current standing, then click to proceed to the next round.
 
-## React Compiler
+## Installation & Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
+- Node.js installed on your machine.
 
-## Expanding the ESLint configuration
+### Clone the Repo
+```bash
+git clone https://github.com/rahulrely/P10.git
+cd P10
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Install Dependencies
+```bash
+npm install
+```
+
+### Run the App locally
+```bash
+npm run dev
+```
+
+Navigate to `http://localhost:5173` in your browser to use the scorer!
+
+## Technologies
+- React 19
+- Vite
+- Vanilla CSS
