@@ -45,6 +45,19 @@ pipeline {
                 '''
             }
         }
+        stage('Debug') {
+            steps {
+                sh '''
+                whoami
+                pwd
+                which node || true
+                which npm || true
+                node -v || true
+                npm -v || true
+                env
+                '''
+            }
+        }
     }
 
     post {
