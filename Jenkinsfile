@@ -13,7 +13,19 @@ pipeline {
                 checkout scm
             }
         }
-
+        stage('Debug') {
+            steps {
+                sh '''
+                whoami
+                pwd
+                which node || true
+                which npm || true
+                node -v || true
+                npm -v || true
+                env
+                '''
+            }
+        }
         stage('Install Dependencies') {
             steps {
                 sh 'npm install'
@@ -42,19 +54,6 @@ pipeline {
                     --name ${CONTAINER_NAME} \
                     -p 3001:80 \
                     ${IMAGE_NAME}:latest
-                '''
-            }
-        }
-        stage('Debug') {
-            steps {
-                sh '''
-                whoami
-                pwd
-                which node || true
-                which npm || true
-                node -v || true
-                npm -v || true
-                env
                 '''
             }
         }
