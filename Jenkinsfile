@@ -7,37 +7,37 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-        stage('Debug') {
+
+    
+        stage('Build React App') {
+            agent {
+                docker {
+                    image 'node:22-alpine' 
+                    reuseNode true         
+                }
+            }
             steps {
+       
                 sh '''
-                whoami
-                pwd
-                which node || true
-                which npm || true
-                node -v || true
-                npm -v || true
-                env
+                echo "--- Node Environment ---"
+                node -v
+                npm -v
+                
+                echo "--- Installing Dependencies ---"
+                npm install
+                
+                echo "--- Building App ---"
+                npm run build
                 '''
             }
         }
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install'
-            }
-        }
 
-        stage('Build React App') {
-            steps {
-                sh 'npm run build'
-            }
-        }
-
+        // Back on the Jenkins host. It will see the 'dist'/'build' folder created by the step above.
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t ${IMAGE_NAME}:latest .'
@@ -61,10 +61,10 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment Successful!'
+            echo 'Deployment Successful! Phase Ten Scorer is live.'
         }
         failure {
-            echo 'Deployment Failed!'
+            echo 'Deployment Failed! Check the logs above.'
         }
     }
 }
