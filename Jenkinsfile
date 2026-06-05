@@ -4,6 +4,8 @@ pipeline {
     environment {
         IMAGE_NAME = "phase-ten-scorer"
         CONTAINER_NAME = "phase-ten-scorer"
+        NEXUS_REGISTRY = "10.0.0.4:8083" 
+        NEXUS_CREDENTIALS_ID = "nexus-login"
     }
 
     stages {
@@ -13,37 +15,58 @@ pipeline {
             }
         }
 
-    
+        // 1. SONARQUBE QUALITY GATE
+        stage('SonarQube Analysis') {
+            steps {
+                // 'sonar' must match the name you gave your Sonar server in Jenkins Manage -> System -> name 
+                withSonarQubeEnv('sonar') {
+                    sh '''
+                    # Uses a lightweight sonar-scanner container to scan your code
+                    docker run --rm -v "${PWD}:/usr/src" sonarsource/sonar-scanner-cli
+                    '''
+                }
+            }
+        }
+
+        // 2. BUILD REACT APP
         stage('Build React App') {
             agent {
                 docker {
-                    image 'node:22-alpine' 
-                    reuseNode true         
+                    image 'node:22-alpine'
+                    reuseNode true
                 }
             }
             steps {
-       
                 sh '''
-                echo "--- Node Environment ---"
-                node -v
-                npm -v
-                
-                echo "--- Installing Dependencies ---"
                 npm install
-                
-                echo "--- Building App ---"
                 npm run build
                 '''
             }
         }
 
-        // Back on the Jenkins host. It will see the 'dist'/'build' folder created by the step above.
+        // 3. BUILD DOCKER IMAGE
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t ${IMAGE_NAME}:latest .'
+                // Tag the image specifically for your Nexus registry
+                sh 'docker build -t ${NEXUS_REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER} .'
+                sh 'docker tag ${NEXUS_REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER} ${NEXUS_REGISTRY}/${IMAGE_NAME}:latest'
             }
         }
 
+        // 4. PUSH TO NEXUS (ARTIFACT REPOSITORY)
+        stage('Push to Nexus') {
+            steps {
+                script {
+                    // Logs into Nexus using stored Jenkins credentials
+                    docker.withRegistry("http://${NEXUS_REGISTRY}", "${NEXUS_CREDENTIALS_ID}") {
+                        sh 'docker push ${NEXUS_REGISTRY}/${IMAGE_NAME}:${BUILD_NUMBER}'
+                        sh 'docker push ${NEXUS_REGISTRY}/${IMAGE_NAME}:latest'
+                    }
+                }
+            }
+        }
+
+        // 5. DEPLOY CONTAINER
         stage('Deploy Container') {
             steps {
                 sh '''
@@ -53,18 +76,22 @@ pipeline {
                 docker run -d \
                     --name ${CONTAINER_NAME} \
                     -p 3001:80 \
-                    ${IMAGE_NAME}:latest
+                    ${NEXUS_REGISTRY}/${IMAGE_NAME}:latest
                 '''
             }
         }
     }
 
     post {
+        always {
+            // Clean up old Docker images to save disk space on your VM
+            sh 'docker image prune -f'
+        }
         success {
             echo 'Deployment Successful! Phase Ten Scorer is live.'
         }
         failure {
-            echo 'Deployment Failed! Check the logs above.'
+            echo 'Deployment Failed! Check the logs.'
         }
     }
 }
