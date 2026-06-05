@@ -24,7 +24,7 @@ pipeline {
                         -v "${WORKSPACE}:/usr/src" \
                         -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
                         sonarsource/sonar-scanner-cli \
-                        -Dsonar.projectKey=phase-ten-scorer \
+                        -Dsonar.projectKey=Phase-Ten-Scorer \
                         -Dsonar.sources=. \
                         -Dsonar.exclusions=node_modules/**,dist/** \
                         -Dsonar.login="${SONAR_AUTH_TOKEN}"
