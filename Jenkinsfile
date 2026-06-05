@@ -18,11 +18,19 @@ pipeline {
         // 1. SONARQUBE QUALITY GATE
         stage('SonarQube Analysis') {
             steps {
-                // 'sonar' must match the name you gave your Sonar server in Jenkins Manage -> System -> name 
+                // "sonar" matches the name from your logs: "using the configuration: sonar"
                 withSonarQubeEnv('sonar') {
                     sh '''
-                    # Uses a lightweight sonar-scanner container to scan your code
-                    docker run --rm -v "${PWD}:/usr/src" sonarsource/sonar-scanner-cli
+                    docker run --rm \
+                        -v "${WORKSPACE}:/usr/src" \
+                        -e SONAR_HOST_URL="${SONAR_HOST_URL}" \
+                        -e SONAR_TOKEN="${SONAR_AUTH_TOKEN}" \
+                        sonarsource/sonar-scanner-cli \
+                        -Dsonar.projectKey=phase-ten-scorer \
+                        -Dsonar.projectName="Phase Ten Scorer" \
+                        -Dsonar.organization=your-sonarcloud-org-key \
+                        -Dsonar.sources=. \
+                        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
                     '''
                 }
             }
