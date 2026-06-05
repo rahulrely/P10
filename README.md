@@ -42,3 +42,5 @@ Navigate to `http://localhost:5173` in your browser to use the scorer!
 - React 19
 - Vite
 - Vanilla CSS
+
+AI Generated APP
